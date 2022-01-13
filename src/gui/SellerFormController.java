@@ -1,8 +1,10 @@
 package gui;
 
 import java.net.URL;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -120,8 +122,26 @@ public class SellerFormController implements Initializable {
 		if (txtName.getText() == null || txtName.getText().equals("")) {
 			exception.addError("name", "cannot be empty");
 		}
-
 		obj.setName(txtName.getText());
+
+		if (txtEmail.getText() == null || txtEmail.getText().equals("")) {
+			exception.addError("email", "cannot be empty");
+		}
+		obj.setEmail(txtEmail.getText());
+
+		if (dpBirthDate.getValue() == null) {
+			exception.addError("birthDate", "cannot be empty");
+		} else {
+			Instant instant = Instant.from(dpBirthDate.getValue().atStartOfDay(ZoneId.systemDefault()));
+			obj.setBirthDate(Date.from(instant));
+
+		}
+		if (txtBaseSalary.getText() == null || txtBaseSalary.getText().equals("")) {
+			exception.addError("baseSalary", "cannot be empty");
+		}
+		obj.setBaseSalary(Utils.tryParseToDouble(txtBaseSalary.getText()));
+		
+		obj.setDepartment(comboBoxDepartment.getValue());
 
 		if (exception.getErrors().size() > 0) {
 			throw exception;
@@ -146,7 +166,7 @@ public class SellerFormController implements Initializable {
 		Constraints.setTextFieldDouble(txtBaseSalary);
 		Constraints.setTextFieldMaxLength(txtEmail, 60);
 		Utils.formatDatePicker(dpBirthDate, "dd/MM/yyyy");
-		
+
 		initializeComboBoxDepartment();
 	}
 
@@ -172,12 +192,12 @@ public class SellerFormController implements Initializable {
 			dpBirthDate.setValue(LocalDate.ofInstant(entity.getBirthDate().toInstant(), ZoneId.systemDefault()));
 
 		}
-		
-		if (entity.getDepartment()==null) {
+
+		if (entity.getDepartment() == null) {
 			comboBoxDepartment.getSelectionModel().selectFirst();
 		}
 		comboBoxDepartment.setValue(entity.getDepartment());
-		
+
 	}
 
 	public void subscribeDataChangeListener(DataChangeListener dataChangeListener) {
@@ -189,6 +209,19 @@ public class SellerFormController implements Initializable {
 		if (fields.contains("name")) {
 			labelErrorName.setText(errors.get("name"));
 		}
+		else labelErrorName.setText("");
+		if (fields.contains("email")) {
+			labelEmail.setText(errors.get("email"));
+		}
+		else labelEmail.setText("");
+		if (fields.contains("baseSalary")) {
+			labelBaseSalary.setText(errors.get("baseSalary"));
+		}
+		else labelBaseSalary.setText("");
+		if (fields.contains("birthDate")) {
+			labelBirthDate.setText(errors.get("birthDate"));
+		}
+		else labelBirthDate.setText("");
 	}
 
 	public void loadAssocuatedObjects() {
